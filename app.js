@@ -1,8 +1,8 @@
 const tlLeave = gsap.timeline({
-  default: { duration: 0.75, ease: 'Power2.easeOut' },
+  defaults: { duration: 0.75, ease: 'Power2.easeOut' },
 });
 const tlEnter = gsap.timeline({
-  default: { duration: 0.75, ease: 'Power2.easeOut' },
+  defaults: { duration: 0.75, ease: 'Power2.easeOut' },
 });
 
 //Make the functions for the leave and enter animations
@@ -67,8 +67,8 @@ const enterAnimation = (current, done, gradient) => {
 barba.init({
   preventRunning: true,
   transitions: [
+    //showcase transitions
     {
-      //showcase transitions
       name: 'default',
       once(data) {
         const done = this.async();
@@ -89,9 +89,37 @@ barba.init({
         enterAnimation(next, done, gradient);
       },
     },
+    //product page animation
+    {
+      name: 'product-transition',
+      sync: true,
+      from: { namespace: ['handbag', 'product'] },
+      to: { namespace: ['product', 'handbag'] },
+      enter(data) {
+        const done = this.async();
+        let next = data.next.container;
+        productEnterAnimation(next, done);
+      },
+      leave(data) {
+        const done = this.async();
+        let current = data.current.container;
+        productLeaveAnimation(current, done);
+      },
+    },
   ],
 });
 
+function productEnterAnimation(next, done) {
+  tlEnter.fromTo(next, { y: '100%' }, { y: '0%' });
+  tlEnter.fromTo(
+    '.card',
+    { opacity: 0, y: 50 },
+    { opacity: 1, y: 0, stagger: 0.1, onComplete: done }
+  );
+}
+function productLeaveAnimation(current, done) {
+  tlLeave.fromTo(current, { y: '0%' }, { y: '100%', onComplete: done });
+}
 //changing gradient on showcase
 function getGradient(name) {
   switch (name) {
